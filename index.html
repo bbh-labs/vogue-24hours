@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id='player'></div>
+        <div id='controls'></div>
+
+        <script>
+            'use strict';
+
+            var VIDEO_DURATION = 4 * 3600 + 39 * 60 + 9;
+            var times = [
+              0,0,1412,2068,2581,3661,5194,5670,7119,7639,8018,8578,9198,9918,10548,11582,12088,13529,14197,15102,15773,16071,16251,16431,16611,
+            ];
+
+            var tag = document.createElement('script');
+
+            tag.src = 'https://www.youtube.com/iframe_api';
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            var player;
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player('player', {
+                    height: '600px',
+                    width: '100%',
+                    videoId: 'lbCQVa5ZI4I',
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+
+            function onPlayerReady(event) {
+                event.target.playVideo();
+
+                seekToNow();
+            }
+
+            var done = false;
+            function onPlayerStateChange(event) {
+                if (event.data == YT.PlayerState.PLAYING && !done) {
+                    done = true;
+                }
+            }
+
+            function stopVideo() {
+                player.stopVideo();
+            }
+
+            function seekToNow() {
+                let now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                let seconds = now.getSeconds();
+                let t = hours * 3600 + minutes * 60 + seconds;
+                t = t / 86400 * VIDEO_DURATION;
+                player.seekTo(t, true);
+            }
+
+            var controls = document.getElementById('controls');
+            var nowButton = document.createElement('button');
+            nowButton.innerHTML = 'Now';
+            nowButton.onclick = seekToNow;
+            controls.appendChild(nowButton);
+
+            for (let i = 1; i < times.length; i++) {
+                var button = document.createElement('button');
+                button.onclick = function(event) {
+                    player.seekTo(times[i], true);
+                };
+                button.innerHTML = i;
+                controls.appendChild(button);
+            }
+        </script>
+    </body>
+</html>
